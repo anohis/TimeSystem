@@ -6,13 +6,24 @@ namespace TimeSystem.Core
 	public partial class TimeController
 	{
 		private static Dictionary<string, TimeController> _controllers = new Dictionary<string, TimeController>();
+        private static Dictionary<string, List<TimeObject>> _registerCache = new Dictionary<string, List<TimeObject>>();
 
 		public static void Register(string groupName, TimeObject obj)
 		{
-			if (_controllers.TryGetValue(groupName, out var controller))
-			{
-				controller.AddObject(obj);
-			}
+            if (_controllers.TryGetValue(groupName, out var controller))
+            {
+                controller.AddObject(obj);
+            }
+            else
+            {
+                List<TimeObject> list;
+                if (!_registerCache.TryGetValue(groupName, out list))
+                {
+                    list = new List<TimeObject>();
+                    _registerCache.Add(groupName, list);
+                }
+                list.Add(obj);
+            }
 		}
 		public static void Unregister(string groupName, TimeObject obj)
 		{
@@ -20,7 +31,12 @@ namespace TimeSystem.Core
 			{
 				controller.RemoveObject(obj);
 			}
-		}
+
+            if (_registerCache.TryGetValue(groupName, out var list))
+            {
+                list.Remove(obj);
+            }
+        }
 		public static void SetTimeScale(float timeScale)
 		{
 			foreach (var controller in _controllers.Values)
@@ -83,7 +99,16 @@ namespace TimeSystem.Core
 			if (!_controllers.ContainsKey(groupName))
 			{
 				_controllers.Add(groupName, controller);
-			}
+
+                if (_registerCache.TryGetValue(groupName, out var list))
+                {
+                    foreach (var obj in list)
+                    {
+                        controller.AddObject(obj);
+                    }
+                    _registerCache.Remove(groupName);
+                }
+            }
 		}
 		private static void Unregister(string groupName)
 		{

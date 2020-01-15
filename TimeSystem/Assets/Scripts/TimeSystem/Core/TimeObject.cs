@@ -22,7 +22,7 @@ namespace TimeSystem.Core
 				get{ return _timeObject._timeScale; }
 				set
 				{
-					if (value >= 0)
+					if (value > 0)
 					{
 						var old = _timeObject._timeScale;
 						_timeObject._timeScale = value;
@@ -45,7 +45,7 @@ namespace TimeSystem.Core
 				get { return -_timeObject._timeScale; }
 				set
 				{
-					if (value >= 0)
+					if (value > 0)
 					{
 						_timeObject._timeScale = value;
 					}
@@ -62,7 +62,7 @@ namespace TimeSystem.Core
 				get { return 0; }
 				set
 				{
-					if (value >= 0)
+					if (value > 0)
 					{
 						_timeObject._timeScale = value;
 					}
@@ -159,19 +159,28 @@ namespace TimeSystem.Core
 		}
 		public virtual void Forward()
 		{
-			_currentState = _forwardState;
-			_onForwardHandler?.Invoke();
+            if (_currentState != _forwardState)
+            {
+                _currentState = _forwardState;
+                _onForwardHandler?.Invoke();
+            }
 		}
 		public virtual void Backward()
 		{
-			_currentState = _backwardState;
-			_onBackwardHandler?.Invoke();
+            if (_currentState != _backwardState)
+            {
+                _currentState = _backwardState;
+                _onBackwardHandler?.Invoke();
+            }
 		}
-		public virtual void Pause()
-		{
-			_currentState = _pauseState;
-			_onPauseHandler?.Invoke();
-		}
+        public virtual void Pause()
+        {
+            if (_currentState != _pauseState)
+            {
+                _currentState = _pauseState;
+                _onPauseHandler?.Invoke();
+            }
+        }
 
 		protected virtual void OnTimeUpdate(float deltaTime)
 		{

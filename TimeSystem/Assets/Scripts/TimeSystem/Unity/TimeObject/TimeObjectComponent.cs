@@ -74,7 +74,8 @@ namespace TimeSystem.Unity
 
 		public float TimeScale
 		{
-			set
+            get { return _timeScale; }
+            set
 			{
 				_timeScale = value;
 				if (_timeObject != null)
